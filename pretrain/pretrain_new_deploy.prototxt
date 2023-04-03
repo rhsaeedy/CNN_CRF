@@ -1,0 +1,269 @@
+name: "new"
+
+input: 'Data'
+input_dim: 1
+input_dim: 3
+input_dim: 512
+input_dim: 512
+force_backward: true
+
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "Data"
+  top: "conv1"
+  convolution_param {
+    num_output: 4
+    kernel_size: 3
+    pad: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.01
+    }
+  }
+}     
+
+layer {
+  name: "relu1"
+  type: "PReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2"
+  convolution_param {
+    num_output: 8
+    kernel_size: 3
+    pad: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.01
+    }
+  }
+}
+
+layer {
+  name: "relu2"
+  type: "PReLU"
+  bottom: "conv2"
+  top: "conv2"
+}
+
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+layer {
+  name: "conv3"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv3"
+  convolution_param {
+    num_output: 16
+    kernel_size: 3
+    pad: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.01
+    }
+  }
+}
+
+layer {
+  name: "relu3"
+  type: "PReLU"
+  bottom: "conv3"
+  top: "conv3"
+}
+
+layer {
+  name: "upconv1"
+  type: "Deconvolution"
+  bottom: "conv3"
+  top: "upconv1"
+  convolution_param {
+    num_output: 16
+    kernel_size: 4
+    stride: 2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.01
+    }
+  }
+}
+
+layer {
+  name: "relu_u1"
+  type: "ReLU"
+  bottom: "upconv1"
+  top: "upconv1"
+}
+
+layer {
+   name: "lrn1"
+   type: "LRN"
+   bottom: "upconv1"
+   top: "upconv1"
+   lrn_param {
+   local_size: 5
+   norm_region: WITHIN_CHANNEL
+   alpha: 0.0001
+   beta: 0.75 
+   k : 2
+  }
+} 
+
+layer {name: "crop1" type: "Crop" bottom: "upconv1" bottom: "conv2"  top: "crop1"}
+
+layer {
+  name: "concat1"
+  bottom: "crop1"
+  bottom: "conv2"
+  top: "concat1"
+  type: "Concat"
+  concat_param {
+    axis: 1
+  }
+}
+
+layer {
+  name: "conv4"
+  type: "Convolution"
+  bottom: "concat1"
+  top: "conv4"
+  convolution_param {
+    num_output: 32
+    kernel_size: 3
+    pad: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.01
+    }
+  }
+}
+
+layer {
+  name: "relu4"
+  type: "PReLU"
+  bottom: "conv4"
+  top: "conv4"
+}
+
+layer {
+  name: "upconv2"
+  type: "Deconvolution"
+  bottom: "conv4"
+  top: "upconv2"
+  convolution_param {
+    num_output: 4
+    kernel_size: 4
+    stride: 2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.01
+    }
+  }
+}
+
+layer {
+  name: "relu_u2"
+  type: "ReLU"
+  bottom: "upconv2"
+  top: "upconv2"
+}
+
+layer {
+   name: "lrn2"
+   type: "LRN"
+   bottom: "upconv2"
+   top: "upconv2"
+   lrn_param {
+   local_size: 5
+   norm_region: WITHIN_CHANNEL
+   alpha: 0.0001
+   beta: 0.75 
+   k : 2
+  }
+} 
+
+layer {name: "crop2" type: "Crop" bottom: "upconv2" bottom: "conv1" top: "crop2"}
+
+layer {
+  name: "concat2"
+  bottom: "crop2"
+  bottom: "conv1"
+  top: "concat2"
+  type: "Concat"
+  concat_param {
+    axis: 1
+  }
+}
+
+layer {
+  name: "conv5"
+  type: "Convolution"
+  bottom: "concat2"
+  top: "conv5"
+  convolution_param {
+    num_output: 4
+    kernel_size: 3
+    pad: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.01
+    }
+  }
+}
+
+layer {
+  name: "relu5"
+  type: "PReLU"
+  bottom: "conv5"
+  top: "conv5"
+}
+

@@ -1,0 +1,9 @@
+gamb3.png
+bp3.png
+lrc3.png
+castle3.png
+ss3.png
+ss3_c.pgm
+manga.png
+stone.jpg
+disk.png
